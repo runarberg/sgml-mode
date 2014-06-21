@@ -81,7 +81,7 @@ a DOCTYPE or an XML declaration."
 ;; As long as Emacs's syntax can't be complemented with predicates to context
 ;; sensitively confirm the syntax of characters, we have to live with this
 ;; kludgy kind of tradeoff.
-(defvar sgml-specials '(?\")
+(defvar sgml-specials '(?\" ?')
   "List of characters that have a special meaning for SGML mode.
 This list is used when first loading the `sgml-mode' library.
 The supported characters and potential disadvantages are:
@@ -314,13 +314,16 @@ Any terminating `>' or `/' is not matched.")
   (syntax-propertize-rules
    ;; Use the `b' style of comments to avoid interference with the -- ... --
    ;; comments recognized when `sgml-specials' includes ?-.
-  ;; FIXME: beware of <!--> blabla <!--> !!
+   ;; FIXME: beware of <!--> blabla <!--> !!
    ("\\(<\\)!--" (1 "< b"))
     ("--[ \t\n]*\\(>\\)" (1 "> b"))
-    ;; Double quotes outside of tags should not introduce strings.
+    ;; Quotes outside of tags should not introduce strings.
     ;; Be careful to call `syntax-ppss' on a position before the one we're
     ;; going to change, so as not to need to flush the data we just computed.
     ("\"" (0 (if (prog1 (zerop (car (syntax-ppss (match-beginning 0))))
+                   (goto-char (match-end 0)))
+           (string-to-syntax "."))))
+    ("'" (0 (if (prog1 (zerop (car (syntax-ppss (match-beginning 0))))
                    (goto-char (match-end 0)))
            (string-to-syntax ".")))))
   "Syntactic keywords for `sgml-mode'.")
