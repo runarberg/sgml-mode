@@ -1696,8 +1696,7 @@ This takes effect when first loading the library.")
     (li . "o "))
   "Value of `sgml-display-text' for HTML mode.")
 
-
-;; should code exactly HTML 3 here when that is finished
+;; should code exactly HTML5 here when that is finished
 (defvar html-tag-alist
   (let* ((1-7 '(("1") ("2") ("3") ("4") ("5") ("6") ("7")))
 	 (1-9 `(,@1-7 ("8") ("9")))
