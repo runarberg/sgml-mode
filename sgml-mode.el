@@ -170,7 +170,7 @@ This takes effect when first loading the `sgml-mode' library.")
     (if (memq ?\" specials)
 	(modify-syntax-entry ?\" "\"\"" table))
     (if (memq ?' specials)
-	(modify-syntax-entry ?\' "\"'" table))
+	(modify-syntax-entry ?' "\"'" table))
     table))
 
 (defvar sgml-mode-syntax-table (sgml-make-syntax-table sgml-specials)
@@ -316,16 +316,16 @@ Any terminating `>' or `/' is not matched.")
    ;; comments recognized when `sgml-specials' includes ?-.
    ;; FIXME: beware of <!--> blabla <!--> !!
    ("\\(<\\)!--" (1 "< b"))
-    ("--[ \t\n]*\\(>\\)" (1 "> b"))
-    ;; Quotes outside of tags should not introduce strings.
-    ;; Be careful to call `syntax-ppss' on a position before the one we're
-    ;; going to change, so as not to need to flush the data we just computed.
-    ("\"" (0 (if (prog1 (zerop (car (syntax-ppss (match-beginning 0))))
-                   (goto-char (match-end 0)))
-           (string-to-syntax "."))))
-    ("'" (0 (if (prog1 (zerop (car (syntax-ppss (match-beginning 0))))
-                   (goto-char (match-end 0)))
-           (string-to-syntax ".")))))
+   ("--[ \t\n]*\\(>\\)" (1 "> b"))
+   ;; Quotes outside of tags should not introduce strings.
+   ;; Be careful to call `syntax-ppss' on a position before the one we're
+   ;; going to change, so as not to need to flush the data we just computed.
+   ("\"" (0 (if (prog1 (zerop (car (syntax-ppss (match-beginning 0))))
+                  (goto-char (match-end 0)))
+                (string-to-syntax "."))))
+   ("'" (0 (if (prog1 (zerop (car (syntax-ppss (match-beginning 0))))
+                 (goto-char (match-end 0)))
+               (string-to-syntax ".")))))
   "Syntactic keywords for `sgml-mode'.")
 
 ;; internal
@@ -958,7 +958,6 @@ With prefix argument ARG, repeat this ARG times."
 	    (delete-region (match-beginning 0) (match-end 0)))))
     (setq arg (1- arg))))
 
-
 ;; Put read-only last to enable setting this even when read-only enabled.
 (or (get 'sgml-tag 'invisible)
     (setplist 'sgml-tag
@@ -1029,7 +1028,6 @@ With prefix argument ARG, repeat this ARG times."
 	(error nil)))))
 
 
-
 (defun sgml-validate (command)
   "Validate an SGML document.
 Runs COMMAND, a shell command, in a separate process asynchronously
@@ -1190,7 +1188,6 @@ You might want to turn on `auto-fill-mode' to get better results."
     ;; (indent-region beg end)
     ))
 
-
 ;; Parsing
 
 (cl-defstruct (sgml-tag
@@ -1398,7 +1395,6 @@ If FULL is non-nil, parse back to the beginning of the buffer."
 	      (setq context (nconc more context)))))
 	(pp context)))))
 
-
 ;; Editing shortcuts
 
 (defun sgml-close-tag ()
@@ -1804,12 +1800,13 @@ This takes effect when first loading the library.")
       ("ins")
       ("isindex" t ("action") ("prompt"))
       ("kbd")
-      ("label" \n ("for"))
+      ("label" nil ("for"))
       ("lang")
       ("li")
       ("math" \n)
       ("nav" \n ("class") ("id"))
       ("nobr")
+      ("object" nil ("data") ("type"))
       ("option" t ("value") ("label") ("selected" t))
       ("pre" \n)
       ("q")
@@ -2008,9 +2005,9 @@ To work around that, do:
 	      '("area" "base" "basefont" "br" "col" "frame" "hr" "img" "input"
 		"isindex" "link" "meta" "param" "wbr"))
   (setq-local sgml-unclosed-tags
-	      ;; From HTML-4.01's loose.dtd, parsed with `sgml-parse-dtd'.
-	      '("body" "colgroup" "dd" "dt" "head" "html" "li" "option"
-		"p" "tbody" "td" "tfoot" "th" "thead" "tr"))
+              ;; From HTML-4.01's loose.dtd, parsed with `sgml-parse-dtd'.
+              '("body" "colgroup" "dd" "dt" "head" "html" "li" "option"
+                "p" "tbody" "td" "tfoot" "th" "thead" "tr"))
   ;; It's for the user to decide if it defeats it or not  -stef
   ;; (make-local-variable 'imenu-sort-function)
   ;; (setq imenu-sort-function nil) ; sorting the menu defeats the purpose
@@ -2053,7 +2050,6 @@ HTML Autoview mode is a buffer-local minor mode for use with
       (add-hook 'after-save-hook 'browse-url-of-buffer nil t)
     (remove-hook 'after-save-hook 'browse-url-of-buffer t)))
 
-
 (define-skeleton html-href-anchor
   "HTML anchor tag with href attribute."
   "URL: "
