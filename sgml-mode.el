@@ -1696,26 +1696,30 @@ This takes effect when first loading the library.")
 ;; should code exactly HTML5 here when that is finished
 (defvar html-tag-alist
   (let* ((1-7 '(("1") ("2") ("3") ("4") ("5") ("6") ("7")))
-	 (1-9 `(,@1-7 ("8") ("9")))
-	 (align '(("align" ("left") ("center") ("right"))))
-	 (valign '(("top") ("middle") ("bottom") ("baseline")))
-	 (rel '(("stylesheet") ("next") ("previous") ("parent") ("subdocument") ("made")))
-	 (href '("href" ("ftp:") ("file:") ("finger:") ("gopher:") ("http:")
-		 ("mailto:") ("news:") ("rlogin:") ("telnet:") ("tn3270:")
-		 ("wais:") ("/cgi-bin/")))
-	 (name '("name"))
-	 (link `(,href
-		 ("rel" ,@rel)
-		 ("rev" ,@rel)
-		 ("title")))
-	 (list '((nil \n ("List item: " "<li>" str "</li>" \n)))))
+         (1-9 `(,@1-7 ("8") ("9")))
+         (align '(("align" ("left") ("center") ("right"))))
+         (valign '(("top") ("middle") ("bottom") ("baseline")))
+         (rel '(("stylesheet") ("next") ("previous") ("parent") ("subdocument") ("made")))
+         (href '("href" ("ftp:") ("file:") ("finger:") ("gopher:") ("http:")
+                 ("mailto:") ("news:") ("rlogin:") ("telnet:") ("tn3270:")
+                 ("wais:") ("/cgi-bin/")))
+         (name '("name"))
+         (link `(,href
+                 ("rel" ,@rel)
+                 ("rev" ,@rel)
+                 ("title")))
+         (list '((nil \n ("List item: " "<li>" str "</li>" \n))))
+         (global `(("accesskey") ("class") ("contenteditable") ("contextmenu")
+                   ("data-") ("dir") ("hidden") ("id") ("lang") ("style")
+                   ("tabindex") ("title"))))
     ;; put ,-expressions first, else byte-compile chokes (as of V19.29)
     ;; and like this it's more efficient anyway
     `(("a" ,name ,@link)
       ("base" t ,@href)
       ("dir" ,@list)
+      ("div" \n ,@global)
       ("form" (\n _ \n "<input type=\"submit\" value=\"\""
-	       (if sgml-xml-mode " />" ">"))
+               (if sgml-xml-mode " />" ">"))
        ("action" ,@(cdr href)) ("method" ("get") ("post")))
       ("h1" ,@align)
       ("h2" ,@align)
@@ -1729,7 +1733,7 @@ This takes effect when first loading the library.")
        ("border" "1") ("vspace" "1") ("hspace" "1") ("ismap" t))
       ("input" t ("size" ,@1-9) ("maxlength" ,@1-9) ("checked" t) ,name
        ("type" ("text") ("password") ("checkbox") ("radio") ("number")
-	("submit") ("reset"))
+        ("submit") ("reset"))
        ("value"))
       ("link" t ,@link)
       ("meta" t ("charset" "utf-8") ("content")
@@ -1742,13 +1746,14 @@ This takes effect when first loading the library.")
       ("p")
       ("script" ("src") ("type" "text/javascript"))
       ("select" (nil \n
-		     ("Text: "
-		      "<option>" str "</option>" \n))
+                     ("Text: "
+                      "<option>" str "</option>" \n))
        ,name ("size" ,@1-9) ("multiple" t))
+      ("span" nil ,@global)
       ("table" (nil \n
-		    ((completing-read "Cell kind: " '(("td") ("th"))
-				      nil t "t")
-		     "<tr><" str ?> _ (concat "<" str "></tr>") \n))
+                    ((completing-read "Cell kind: " '(("td") ("th"))
+                                      nil t "t")
+                     "<tr><" str ?> _ (concat "<" str "></tr>") \n))
        ("border" t ,@1-9) ("width" "10") ("cellpadding"))
       ("td")
       ("textarea" ,name ("rows" ,@1-9) ("cols" ,@1-9))
@@ -1772,10 +1777,9 @@ This takes effect when first loading the library.")
       ("dd")
       ("del")
       ("dfn")
-      ("div" \n ("class") ("id"))
       ("dl" (nil \n
-		 ("Term: "
-		  > "<dt>" str "</dt>\n"
+                 ("Term: "
+                  > "<dt>" str "</dt>\n"
                   > "<dd>" _ "</dd>\n")))
       ("dt" ( "Term: " str "</dt>\n"
               "<dd>" _ "</dd>\n" \n))
@@ -1786,14 +1790,14 @@ This takes effect when first loading the library.")
       ("head" \n)
       ("header" \n ("class") ("id"))
       ("html" (\n
-	       > "<head>\n"
+               > "<head>\n"
                > "<meta charset=\"utf-8\">\n"
-	       > "<title>" (setq str (read-input "Title: ")) "</title>\n"
-	       "</head>" > \n
-	       > "<body>\n"
+               > "<title>" (setq str (read-input "Title: ")) "</title>\n"
+               "</head>" > \n
+               > "<body>\n"
                > "<h1>" str "</h1>\n"
                > _ \n
-	       "</body>" >))
+               "</body>" >))
       ("i")
       ("ins")
       ("isindex" t ("action") ("prompt"))
@@ -1814,20 +1818,10 @@ This takes effect when first loading the library.")
       ("samp")
       ("section" \n ("class") ("id"))
       ("small")
-      ("span" nil
-	("class"
-	 ("builtin")
-	 ("comment")
-	 ("constant")
-	 ("function-name")
-	 ("keyword")
-	 ("string")
-	 ("type")
-	 ("variable-name")
-	 ("warning")))
       ("strong")
       ("sub")
       ("sup")
+      ("template" \n ("name"))
       ("title")
       ("tr" (\n
              "<td>" _ "</td>"))
@@ -1915,6 +1909,7 @@ This takes effect when first loading the library.")
     ("sub" . "Subscript")
     ("sup" . "Superscript")
     ("table" . "Table with rows and columns")
+    ("template" . "Container for holding client side content")
     ("tb" . "Table vertical break")
     ("td" . "Table data cell")
     ("textarea" . "Form multiline edit area")
